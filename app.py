@@ -1,16 +1,20 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import subprocess
 import os
 import uuid
 
 app = Flask(__name__)
 
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
 @app.route('/score', methods=['POST'])
 def get_score():
     data = request.get_json()
     documento = data.get('documento')
     if not documento:
-        return jsonify({'error': 'Falta el campo documento'}), 400
+        return jsonify({'output': 'Falta el campo documento'}), 400
 
     # Crear un archivo temporal con el documento solicitado
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -40,4 +44,5 @@ def get_score():
     return jsonify({'output': output})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    port = int(os.environ.get('PORT', 8000))
+    app.run(host='0.0.0.0', port=port)
